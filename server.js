@@ -322,6 +322,6 @@ app.post('/api/favorite', async (req, res) => {
 
 // 서버 시작
 app.listen(PORT, () => {
-  console.log(`서버가 http://localhost:${PORT} 에서 실행중입니다.`);
+  console.log(`서버가 포트 ${PORT} 에서 실행중입니다.`);
   console.log('MySQL 데이터베이스에 연결되었습니다.');
 });
