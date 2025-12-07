@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>반복 학습 - Elemind</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(166, 206, 252, 0.5);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      color: #1a77e0;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+
+    .progress-info {
+      color: #2a2a2a;
+      font-size: 16px;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .card-container {
+      perspective: 1000px;
+      margin: 30px auto;
+      width: 300px;
+      height: 300px;
+    }
+
+    .card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+      transition: transform 0.6s;
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+      border: 3px solid rgba(26, 119, 224, 0.5);
+    }
+
+    .card-front {
+      background: linear-gradient(135deg, #1a77e0 0%, #1561c4 100%);
+      color: white;
+    }
+
+    .card-back {
+      background: linear-gradient(135deg, #a6cefc 0%, #7db5f5 100%);
+      color: #2a2a2a;
+      transform: rotateY(180deg);
+    }
+
+    .element-number {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .element-symbol {
+      font-size: 72px;
+      font-weight: bold;
+    }
+
+    .element-name-ko {
+      font-size: 32px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .element-name-en {
+      font-size: 24px;
+      opacity: 0.9;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .invisible {
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: none;
+    }
+
+    .btn {
+      padding: 15px 40px;
+      background: linear-gradient(135deg, #1a77e0 0%, #0d5bb5 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      transition: transform 0.2s, box-shadow 0.3s;
+      box-shadow: 0 5px 20px rgba(26, 119, 224, 0.3);
+      margin: 10px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(26, 119, 224, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .button-container {
+      position: relative;
+      height: 60px;
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .button-container .btn {
+      position: static;
+      transform: none;
+      margin: 0;
+      width: 140px;
+    }
+
+    .button-container .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .button-container .btn:active {
+      transform: translateY(0);
+    }
+
+    #flip-next-container {
+      position: relative;
+      width: 140px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #flip-next-container .btn {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      margin: 0;
+    }
+
+    #flip-next-container .btn:hover {
+      transform: translate(-50%, -50%) translateY(-2px);
+    }
+
+    #flip-next-container .btn:active {
+      transform: translate(-50%, -50%) translateY(0);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+      box-shadow: 0 5px 20px rgba(108, 117, 125, 0.3);
+    }
+
+    .btn-secondary:hover {
+      box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+    }
+
+    .btn-secondary:disabled {
+      background: linear-gradient(135deg, #ced4da 0%, #adb5bd 100%);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .btn-secondary:disabled:hover {
+      transform: none;
+      box-shadow: 0 5px 20px rgba(108, 117, 125, 0.3);
+    }
+
+    .btn-end {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+      box-shadow: 0 5px 20px rgba(255, 107, 107, 0.3);
+    }
+
+    .btn-end:hover {
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚛️ 반복 학습</h1>
+    
+    <div id="start-screen">
+      <p style="color: #666; margin-bottom: 30px; font-size: 18px;">
+        118개의 원소를 순서대로 학습합니다
+      </p>
+      <button class="btn" onclick="startStudy()">학습 시작</button>
+    </div>
+
+    <div id="study-screen" class="hidden">
+      <div class="progress-info">
+        <span id="progress">1 / 118</span>
+      </div>
+
+      <div class="card-container">
+        <div class="card" id="element-card">
+          <div class="card-front">
+            <div class="element-number" id="front-number">1</div>
+            <div class="element-symbol" id="front-symbol">H</div>
+          </div>
+          <div class="card-back">
+            <div class="element-name-ko" id="back-name-ko">수소</div>
+            <div class="element-name-en" id="back-name-en">Hydrogen</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="button-container">
+        <button class="btn btn-secondary" id="prev-btn" onclick="prevElement()" disabled>이전 원소</button>
+        <div id="flip-next-container">
+          <button class="btn" id="flip-btn" onclick="flipCard()">확인하기</button>
+          <button class="btn invisible" id="next-btn" onclick="nextElement()">다음 원소</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="end-screen" class="hidden">
+      <p style="color: #1a77e0; margin-bottom: 30px; font-size: 24px; font-weight: 600;">
+        🎉 학습 완료!
+      </p>
+      <p style="color: #666; margin-bottom: 30px; font-size: 16px;">
+        118개의 원소를 모두 학습했습니다
+      </p>
+      <button class="btn btn-end" onclick="window.close()">학습 종료</button>
+    </div>
+  </div>
+
+  <script>
+    const elements = [
+      { number: 1, symbol: 'H', nameKo: '수소', nameEn: 'Hydrogen' },
+      { number: 2, symbol: 'He', nameKo: '헬륨', nameEn: 'Helium' },
+      { number: 3, symbol: 'Li', nameKo: '리튬', nameEn: 'Lithium' },
+      { number: 4, symbol: 'Be', nameKo: '베릴륨', nameEn: 'Beryllium' },
+      { number: 5, symbol: 'B', nameKo: '붕소', nameEn: 'Boron' },
+      { number: 6, symbol: 'C', nameKo: '탄소', nameEn: 'Carbon' },
+      { number: 7, symbol: 'N', nameKo: '질소', nameEn: 'Nitrogen' },
+      { number: 8, symbol: 'O', nameKo: '산소', nameEn: 'Oxygen' },
+      { number: 9, symbol: 'F', nameKo: '플루오린', nameEn: 'Fluorine' },
+      { number: 10, symbol: 'Ne', nameKo: '네온', nameEn: 'Neon' },
+      { number: 11, symbol: 'Na', nameKo: '나트륨', nameEn: 'Sodium' },
+      { number: 12, symbol: 'Mg', nameKo: '마그네슘', nameEn: 'Magnesium' },
+      { number: 13, symbol: 'Al', nameKo: '알루미늄', nameEn: 'Aluminum' },
+      { number: 14, symbol: 'Si', nameKo: '규소', nameEn: 'Silicon' },
+      { number: 15, symbol: 'P', nameKo: '인', nameEn: 'Phosphorus' },
+      { number: 16, symbol: 'S', nameKo: '황', nameEn: 'Sulfur' },
+      { number: 17, symbol: 'Cl', nameKo: '염소', nameEn: 'Chlorine' },
+      { number: 18, symbol: 'Ar', nameKo: '아르곤', nameEn: 'Argon' },
+      { number: 19, symbol: 'K', nameKo: '칼륨', nameEn: 'Potassium' },
+      { number: 20, symbol: 'Ca', nameKo: '칼슘', nameEn: 'Calcium' },
+      { number: 21, symbol: 'Sc', nameKo: '스칸듐', nameEn: 'Scandium' },
+      { number: 22, symbol: 'Ti', nameKo: '타이타늄', nameEn: 'Titanium' },
+      { number: 23, symbol: 'V', nameKo: '바나듐', nameEn: 'Vanadium' },
+      { number: 24, symbol: 'Cr', nameKo: '크로뮴', nameEn: 'Chromium' },
+      { number: 25, symbol: 'Mn', nameKo: '망가니즈', nameEn: 'Manganese' },
+      { number: 26, symbol: 'Fe', nameKo: '철', nameEn: 'Iron' },
+      { number: 27, symbol: 'Co', nameKo: '코발트', nameEn: 'Cobalt' },
+      { number: 28, symbol: 'Ni', nameKo: '니켈', nameEn: 'Nickel' },
+      { number: 29, symbol: 'Cu', nameKo: '구리', nameEn: 'Copper' },
+      { number: 30, symbol: 'Zn', nameKo: '아연', nameEn: 'Zinc' },
+      { number: 31, symbol: 'Ga', nameKo: '갈륨', nameEn: 'Gallium' },
+      { number: 32, symbol: 'Ge', nameKo: '저마늄', nameEn: 'Germanium' },
+      { number: 33, symbol: 'As', nameKo: '비소', nameEn: 'Arsenic' },
+      { number: 34, symbol: 'Se', nameKo: '셀레늄', nameEn: 'Selenium' },
+      { number: 35, symbol: 'Br', nameKo: '브로민', nameEn: 'Bromine' },
+      { number: 36, symbol: 'Kr', nameKo: '크립톤', nameEn: 'Krypton' },
+      { number: 37, symbol: 'Rb', nameKo: '루비듐', nameEn: 'Rubidium' },
+      { number: 38, symbol: 'Sr', nameKo: '스트론튬', nameEn: 'Strontium' },
+      { number: 39, symbol: 'Y', nameKo: '이트륨', nameEn: 'Yttrium' },
+      { number: 40, symbol: 'Zr', nameKo: '지르코늄', nameEn: 'Zirconium' },
+      { number: 41, symbol: 'Nb', nameKo: '나이오븀', nameEn: 'Niobium' },
+      { number: 42, symbol: 'Mo', nameKo: '몰리브데넘', nameEn: 'Molybdenum' },
+      { number: 43, symbol: 'Tc', nameKo: '테크네튬', nameEn: 'Technetium' },
+      { number: 44, symbol: 'Ru', nameKo: '루테늄', nameEn: 'Ruthenium' },
+      { number: 45, symbol: 'Rh', nameKo: '로듐', nameEn: 'Rhodium' },
+      { number: 46, symbol: 'Pd', nameKo: '팔라듐', nameEn: 'Palladium' },
+      { number: 47, symbol: 'Ag', nameKo: '은', nameEn: 'Silver' },
+      { number: 48, symbol: 'Cd', nameKo: '카드뮴', nameEn: 'Cadmium' },
+      { number: 49, symbol: 'In', nameKo: '인듐', nameEn: 'Indium' },
+      { number: 50, symbol: 'Sn', nameKo: '주석', nameEn: 'Tin' },
+      { number: 51, symbol: 'Sb', nameKo: '안티모니', nameEn: 'Antimony' },
+      { number: 52, symbol: 'Te', nameKo: '텔루륨', nameEn: 'Tellurium' },
+      { number: 53, symbol: 'I', nameKo: '아이오딘', nameEn: 'Iodine' },
+      { number: 54, symbol: 'Xe', nameKo: '제논', nameEn: 'Xenon' },
+      { number: 55, symbol: 'Cs', nameKo: '세슘', nameEn: 'Cesium' },
+      { number: 56, symbol: 'Ba', nameKo: '바륨', nameEn: 'Barium' },
+      { number: 57, symbol: 'La', nameKo: '란타넘', nameEn: 'Lanthanum' },
+      { number: 58, symbol: 'Ce', nameKo: '세륨', nameEn: 'Cerium' },
+      { number: 59, symbol: 'Pr', nameKo: '프라세오디뮴', nameEn: 'Praseodymium' },
+      { number: 60, symbol: 'Nd', nameKo: '네오디뮴', nameEn: 'Neodymium' },
+      { number: 61, symbol: 'Pm', nameKo: '프로메튬', nameEn: 'Promethium' },
+      { number: 62, symbol: 'Sm', nameKo: '사마륨', nameEn: 'Samarium' },
+      { number: 63, symbol: 'Eu', nameKo: '유로퓸', nameEn: 'Europium' },
+      { number: 64, symbol: 'Gd', nameKo: '가돌리늄', nameEn: 'Gadolinium' },
+      { number: 65, symbol: 'Tb', nameKo: '터븀', nameEn: 'Terbium' },
+      { number: 66, symbol: 'Dy', nameKo: '디스프로슘', nameEn: 'Dysprosium' },
+      { number: 67, symbol: 'Ho', nameKo: '홀뮴', nameEn: 'Holmium' },
+      { number: 68, symbol: 'Er', nameKo: '어븀', nameEn: 'Erbium' },
+      { number: 69, symbol: 'Tm', nameKo: '툴륨', nameEn: 'Thulium' },
+      { number: 70, symbol: 'Yb', nameKo: '이터븀', nameEn: 'Ytterbium' },
+      { number: 71, symbol: 'Lu', nameKo: '루테튬', nameEn: 'Lutetium' },
+      { number: 72, symbol: 'Hf', nameKo: '하프늄', nameEn: 'Hafnium' },
+      { number: 73, symbol: 'Ta', nameKo: '탄탈럼', nameEn: 'Tantalum' },
+      { number: 74, symbol: 'W', nameKo: '텅스텐', nameEn: 'Tungsten' },
+      { number: 75, symbol: 'Re', nameKo: '레늄', nameEn: 'Rhenium' },
+      { number: 76, symbol: 'Os', nameKo: '오스뮴', nameEn: 'Osmium' },
+      { number: 77, symbol: 'Ir', nameKo: '이리듐', nameEn: 'Iridium' },
+      { number: 78, symbol: 'Pt', nameKo: '백금', nameEn: 'Platinum' },
+      { number: 79, symbol: 'Au', nameKo: '금', nameEn: 'Gold' },
+      { number: 80, symbol: 'Hg', nameKo: '수은', nameEn: 'Mercury' },
+      { number: 81, symbol: 'Tl', nameKo: '탈륨', nameEn: 'Thallium' },
+      { number: 82, symbol: 'Pb', nameKo: '납', nameEn: 'Lead' },
+      { number: 83, symbol: 'Bi', nameKo: '비스무트', nameEn: 'Bismuth' },
+      { number: 84, symbol: 'Po', nameKo: '폴로늄', nameEn: 'Polonium' },
+      { number: 85, symbol: 'At', nameKo: '아스타틴', nameEn: 'Astatine' },
+      { number: 86, symbol: 'Rn', nameKo: '라돈', nameEn: 'Radon' },
+      { number: 87, symbol: 'Fr', nameKo: '프랑슘', nameEn: 'Francium' },
+      { number: 88, symbol: 'Ra', nameKo: '라듐', nameEn: 'Radium' },
+      { number: 89, symbol: 'Ac', nameKo: '악티늄', nameEn: 'Actinium' },
+      { number: 90, symbol: 'Th', nameKo: '토륨', nameEn: 'Thorium' },
+      { number: 91, symbol: 'Pa', nameKo: '프로트악티늄', nameEn: 'Protactinium' },
+      { number: 92, symbol: 'U', nameKo: '우라늄', nameEn: 'Uranium' },
+      { number: 93, symbol: 'Np', nameKo: '넵투늄', nameEn: 'Neptunium' },
+      { number: 94, symbol: 'Pu', nameKo: '플루토늄', nameEn: 'Plutonium' },
+      { number: 95, symbol: 'Am', nameKo: '아메리슘', nameEn: 'Americium' },
+      { number: 96, symbol: 'Cm', nameKo: '퀴륨', nameEn: 'Curium' },
+      { number: 97, symbol: 'Bk', nameKo: '버클륨', nameEn: 'Berkelium' },
+      { number: 98, symbol: 'Cf', nameKo: '캘리포늄', nameEn: 'Californium' },
+      { number: 99, symbol: 'Es', nameKo: '아인슈타이늄', nameEn: 'Einsteinium' },
+      { number: 100, symbol: 'Fm', nameKo: '페르뮴', nameEn: 'Fermium' },
+      { number: 101, symbol: 'Md', nameKo: '멘델레븀', nameEn: 'Mendelevium' },
+      { number: 102, symbol: 'No', nameKo: '노벨륨', nameEn: 'Nobelium' },
+      { number: 103, symbol: 'Lr', nameKo: '로렌슘', nameEn: 'Lawrencium' },
+      { number: 104, symbol: 'Rf', nameKo: '러더포듐', nameEn: 'Rutherfordium' },
+      { number: 105, symbol: 'Db', nameKo: '더브늄', nameEn: 'Dubnium' },
+      { number: 106, symbol: 'Sg', nameKo: '시보귬', nameEn: 'Seaborgium' },
+      { number: 107, symbol: 'Bh', nameKo: '보륨', nameEn: 'Bohrium' },
+      { number: 108, symbol: 'Hs', nameKo: '하슘', nameEn: 'Hassium' },
+      { number: 109, symbol: 'Mt', nameKo: '마이트너륨', nameEn: 'Meitnerium' },
+      { number: 110, symbol: 'Ds', nameKo: '다름슈타튬', nameEn: 'Darmstadtium' },
+      { number: 111, symbol: 'Rg', nameKo: '뢴트게늄', nameEn: 'Roentgenium' },
+      { number: 112, symbol: 'Cn', nameKo: '코페르니슘', nameEn: 'Copernicium' },
+      { number: 113, symbol: 'Nh', nameKo: '니호늄', nameEn: 'Nihonium' },
+      { number: 114, symbol: 'Fl', nameKo: '플레로븀', nameEn: 'Flerovium' },
+      { number: 115, symbol: 'Mc', nameKo: '모스코븀', nameEn: 'Moscovium' },
+      { number: 116, symbol: 'Lv', nameKo: '리버모륨', nameEn: 'Livermorium' },
+      { number: 117, symbol: 'Ts', nameKo: '테네신', nameEn: 'Tennessine' },
+      { number: 118, symbol: 'Og', nameKo: '오가네손', nameEn: 'Oganesson' }
+    ];
+
+    let currentIndex = 0;
+    let isFlipped = false;
+
+    function startStudy() {
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('study-screen').classList.remove('hidden');
+      showElement(0);
+    }
+
+    function showElement(index) {
+      currentIndex = index;
+      const element = elements[index];
+      
+      // 진행 상황 업데이트
+      document.getElementById('progress').textContent = `${index + 1} / 118`;
+      
+      // 카드 내용 업데이트
+      document.getElementById('front-number').textContent = element.number;
+      document.getElementById('front-symbol').textContent = element.symbol;
+      document.getElementById('back-name-ko').textContent = element.nameKo;
+      document.getElementById('back-name-en').textContent = element.nameEn;
+      
+      // 카드 초기화 (회전 효과 없이)
+      const card = document.getElementById('element-card');
+      card.style.transition = 'none'; // 전환 효과 제거
+      card.classList.remove('flipped');
+      
+      // 다음 프레임에서 transition 복원
+      setTimeout(() => {
+        card.style.transition = '';
+      }, 0);
+      
+      isFlipped = false;
+      
+      // 버튼 상태 초기화
+      document.getElementById('flip-btn').classList.remove('invisible');
+      document.getElementById('next-btn').classList.add('invisible');
+      
+      // 이전 원소 버튼 상태 업데이트
+      const prevBtn = document.getElementById('prev-btn');
+      if (index === 0) {
+        prevBtn.disabled = true;
+      } else {
+        prevBtn.disabled = false;
+      }
+    }
+
+    function flipCard() {
+      document.getElementById('element-card').classList.add('flipped');
+      isFlipped = true;
+      
+      // 확인하기 버튼 즉시 숨김
+      document.getElementById('flip-btn').classList.add('invisible');
+      
+      // 회전 애니메이션이 끝난 후 다음 원소 버튼 표시 (0.6초 후)
+      setTimeout(() => {
+        document.getElementById('next-btn').classList.remove('invisible');
+      }, 600);
+    }
+
+    function nextElement() {
+      if (currentIndex < elements.length - 1) {
+        showElement(currentIndex + 1);
+      } else {
+        // 학습 완료
+        document.getElementById('study-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+      }
+    }
+
+    function prevElement() {
+      if (currentIndex > 0) {
+        showElement(currentIndex - 1);
+      }
+    }
+  </script>
+</body>
+</html>

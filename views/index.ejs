@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주기율표 - 원소 암기</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a77e0 0%, #0d5bb5 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(166, 206, 252, 0.5);
+      padding: 20px 30px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+
+    .header h1 {
+      color: #1a77e0;
+      font-size: 24px;
+      text-shadow: 0 2px 4px rgba(26, 119, 224, 0.1);
+      margin: 0;
+    }
+
+    .user-info {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .username {
+      color: #2a2a2a;
+      font-weight: 600;
+    }
+
+    .logout-btn {
+      padding: 8px 20px;
+      background: linear-gradient(135deg, #1a77e0 0%, #0d5bb5 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(26, 119, 224, 0.3);
+    }
+
+    .logout-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(26, 119, 224, 0.4);
+    }
+
+    .menu-bar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(166, 206, 252, 0.5);
+      padding: 25px 30px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .menu-btn {
+      flex: 1;
+      padding: 14px 8px;
+      background: linear-gradient(135deg, #1a77e0 0%, #0d5bb5 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(26, 119, 224, 0.3);
+    }
+
+    .menu-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(26, 119, 224, 0.4);
+    }
+
+    .periodic-table-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(166, 206, 252, 0.5);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .periodic-table {
+      display: grid;
+      grid-template-columns: repeat(18, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .lanthanides-actinides-container {
+      display: grid;
+      grid-template-columns: repeat(18, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .spacer {
+      grid-column: span 3;
+    }
+
+    .series-card .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+
+    .series-card .card-inner.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .series-indicator {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      background: linear-gradient(135deg, rgba(166, 206, 252, 0.8) 0%, rgba(125, 181, 245, 0.8) 100%);
+      backdrop-filter: blur(5px);
+      border: 2px solid rgba(26, 119, 224, 0.4);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      font-size: 11px;
+      font-weight: 600;
+      color: #2a2a2a;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .series-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      background: linear-gradient(135deg, #a6cefc 0%, #7db5f5 100%);
+      border: 2px solid rgba(26, 119, 224, 0.4);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 8px;
+      padding-top: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      color: #2a2a2a;
+      cursor: pointer;
+      transform: rotateY(180deg);
+    }
+
+    .element-card {
+      aspect-ratio: 1;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+
+    .element-card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      border: 2px solid rgba(166, 206, 252, 0.4);
+    }
+
+    .card-front {
+      background: linear-gradient(135deg, #1a77e0 0%, #1561c4 100%);
+      color: white;
+      padding-top: 20px;
+    }
+
+    .card-back {
+      background: linear-gradient(135deg, #a6cefc 0%, #7db5f5 100%);
+      color: #2a2a2a;
+      transform: rotateY(180deg);
+      padding-top: 20px;
+    }
+
+    .element-number {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      font-size: 9px;
+      font-weight: 600;
+    }
+
+    .element-symbol {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .element-name-ko {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .element-name-ko.small {
+      font-size: 10px;
+    }
+
+    .element-name-en {
+      font-size: 11px;
+      opacity: 0.9;
+    }
+
+    .favorite-btn {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      transition: all 0.3s;
+      z-index: 10;
+      color: white;
+    }
+
+    .favorite-btn:hover {
+      transform: scale(1.2);
+      filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.8));
+    }
+
+    .favorite-btn.active {
+      color: #ffd700;
+      filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8));
+    }
+
+    .empty-cell {
+      background: transparent;
+    }
+
+    /* 족별 색상 - 파란색 계열 테마 */
+    .alkali { 
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; 
+      border-color: rgba(239, 68, 68, 0.5) !important;
+      color: white !important;
+    }
+    .alkaline-earth { 
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important; 
+      border-color: rgba(249, 115, 22, 0.5) !important;
+      color: white !important;
+    }
+    .transition { 
+      background: linear-gradient(135deg, #1a77e0 0%, #1561c4 100%) !important; 
+      border-color: rgba(26, 119, 224, 0.5) !important;
+      color: white !important;
+    }
+    .lanthanide { 
+      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important; 
+      border-color: rgba(139, 92, 246, 0.5) !important;
+      color: white !important;
+    }
+    .actinide { 
+      background: linear-gradient(135deg, #ec4899 0%, #db2777 100%) !important; 
+      border-color: rgba(236, 72, 153, 0.5) !important;
+      color: white !important;
+    }
+    .metalloid { 
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; 
+      border-color: rgba(16, 185, 129, 0.5) !important;
+      color: white !important;
+    }
+    .nonmetal { 
+      background: linear-gradient(135deg, #a6cefc 0%, #7db5f5 100%) !important; 
+      border-color: rgba(166, 206, 252, 0.5) !important;
+      color: #2a2a2a !important;
+    }
+    .halogen { 
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%) !important; 
+      border-color: rgba(6, 182, 212, 0.5) !important;
+      color: white !important;
+    }
+    .noble-gas { 
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important; 
+      border-color: rgba(99, 102, 241, 0.5) !important;
+      color: white !important;
+    }
+
+    @media (max-width: 1200px) {
+      .element-symbol {
+        font-size: 18px;
+      }
+      .element-number {
+        font-size: 9px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-left">
+      <img src="/images/logo.png" alt="로고" class="logo">
+      <h1>주기율표 암기 도우미 - Elemind</h1>
+    </div>
+    <div class="user-info">
+      <span class="username">👤 <%= username %></span>
+      <button class="logout-btn" onclick="location.href='/logout'">로그아웃</button>
+    </div>
+  </div>
+
+  <div class="menu-bar">
+    <button class="menu-btn" onclick="window.open('/repeat-study', '_blank')">반복 학습</button>
+    <button class="menu-btn" onclick="window.open('/multiple-choice', '_blank')">객관식 학습</button>
+    <button class="menu-btn" onclick="window.open('/short-answer', '_blank')">주관식 학습</button>
+    <button class="menu-btn" onclick="window.open('/test', '_blank')">테스트</button>
+  </div>
+
+  <div class="periodic-table-container">
+    <div class="periodic-table" id="periodic-table"></div>
+    <div class="lanthanides-actinides-container" id="lanthanides-actinides"></div>
+  </div>
+
+  <script>
+    // 서버에서 전달받은 즐겨찾기 데이터
+    const userFavorites = <%- JSON.stringify(favorites) %>;
+    
+    // 118개 전체 원소 데이터
+    const elements = [
+      // 1주기
+      { number: 1, symbol: 'H', nameKo: '수소', nameEn: 'Hydrogen', row: 1, col: 1, category: 'nonmetal' },
+      { number: 2, symbol: 'He', nameKo: '헬륨', nameEn: 'Helium', row: 1, col: 18, category: 'noble-gas' },
+      
+      // 2주기
+      { number: 3, symbol: 'Li', nameKo: '리튬', nameEn: 'Lithium', row: 2, col: 1, category: 'alkali' },
+      { number: 4, symbol: 'Be', nameKo: '베릴륨', nameEn: 'Beryllium', row: 2, col: 2, category: 'alkaline-earth' },
+      { number: 5, symbol: 'B', nameKo: '붕소', nameEn: 'Boron', row: 2, col: 13, category: 'metalloid' },
+      { number: 6, symbol: 'C', nameKo: '탄소', nameEn: 'Carbon', row: 2, col: 14, category: 'nonmetal' },
+      { number: 7, symbol: 'N', nameKo: '질소', nameEn: 'Nitrogen', row: 2, col: 15, category: 'nonmetal' },
+      { number: 8, symbol: 'O', nameKo: '산소', nameEn: 'Oxygen', row: 2, col: 16, category: 'nonmetal' },
+      { number: 9, symbol: 'F', nameKo: '플루오린', nameEn: 'Fluorine', row: 2, col: 17, category: 'halogen' },
+      { number: 10, symbol: 'Ne', nameKo: '네온', nameEn: 'Neon', row: 2, col: 18, category: 'noble-gas' },
+      
+      // 3주기
+      { number: 11, symbol: 'Na', nameKo: '나트륨', nameEn: 'Sodium', row: 3, col: 1, category: 'alkali' },
+      { number: 12, symbol: 'Mg', nameKo: '마그네슘', nameEn: 'Magnesium', row: 3, col: 2, category: 'alkaline-earth' },
+      { number: 13, symbol: 'Al', nameKo: '알루미늄', nameEn: 'Aluminum', row: 3, col: 13, category: 'transition' },
+      { number: 14, symbol: 'Si', nameKo: '규소', nameEn: 'Silicon', row: 3, col: 14, category: 'metalloid' },
+      { number: 15, symbol: 'P', nameKo: '인', nameEn: 'Phosphorus', row: 3, col: 15, category: 'nonmetal' },
+      { number: 16, symbol: 'S', nameKo: '황', nameEn: 'Sulfur', row: 3, col: 16, category: 'nonmetal' },
+      { number: 17, symbol: 'Cl', nameKo: '염소', nameEn: 'Chlorine', row: 3, col: 17, category: 'halogen' },
+      { number: 18, symbol: 'Ar', nameKo: '아르곤', nameEn: 'Argon', row: 3, col: 18, category: 'noble-gas' },
+      
+      // 4주기
+      { number: 19, symbol: 'K', nameKo: '칼륨', nameEn: 'Potassium', row: 4, col: 1, category: 'alkali' },
+      { number: 20, symbol: 'Ca', nameKo: '칼슘', nameEn: 'Calcium', row: 4, col: 2, category: 'alkaline-earth' },
+      { number: 21, symbol: 'Sc', nameKo: '스칸듐', nameEn: 'Scandium', row: 4, col: 3, category: 'transition' },
+      { number: 22, symbol: 'Ti', nameKo: '타이타늄', nameEn: 'Titanium', row: 4, col: 4, category: 'transition' },
+      { number: 23, symbol: 'V', nameKo: '바나듐', nameEn: 'Vanadium', row: 4, col: 5, category: 'transition' },
+      { number: 24, symbol: 'Cr', nameKo: '크로뮴', nameEn: 'Chromium', row: 4, col: 6, category: 'transition' },
+      { number: 25, symbol: 'Mn', nameKo: '망가니즈', nameEn: 'Manganese', row: 4, col: 7, category: 'transition' },
+      { number: 26, symbol: 'Fe', nameKo: '철', nameEn: 'Iron', row: 4, col: 8, category: 'transition' },
+      { number: 27, symbol: 'Co', nameKo: '코발트', nameEn: 'Cobalt', row: 4, col: 9, category: 'transition' },
+      { number: 28, symbol: 'Ni', nameKo: '니켈', nameEn: 'Nickel', row: 4, col: 10, category: 'transition' },
+      { number: 29, symbol: 'Cu', nameKo: '구리', nameEn: 'Copper', row: 4, col: 11, category: 'transition' },
+      { number: 30, symbol: 'Zn', nameKo: '아연', nameEn: 'Zinc', row: 4, col: 12, category: 'transition' },
+      { number: 31, symbol: 'Ga', nameKo: '갈륨', nameEn: 'Gallium', row: 4, col: 13, category: 'transition' },
+      { number: 32, symbol: 'Ge', nameKo: '저마늄', nameEn: 'Germanium', row: 4, col: 14, category: 'metalloid' },
+      { number: 33, symbol: 'As', nameKo: '비소', nameEn: 'Arsenic', row: 4, col: 15, category: 'metalloid' },
+      { number: 34, symbol: 'Se', nameKo: '셀레늄', nameEn: 'Selenium', row: 4, col: 16, category: 'nonmetal' },
+      { number: 35, symbol: 'Br', nameKo: '브로민', nameEn: 'Bromine', row: 4, col: 17, category: 'halogen' },
+      { number: 36, symbol: 'Kr', nameKo: '크립톤', nameEn: 'Krypton', row: 4, col: 18, category: 'noble-gas' },
+      
+      // 5주기
+      { number: 37, symbol: 'Rb', nameKo: '루비듐', nameEn: 'Rubidium', row: 5, col: 1, category: 'alkali' },
+      { number: 38, symbol: 'Sr', nameKo: '스트론튬', nameEn: 'Strontium', row: 5, col: 2, category: 'alkaline-earth' },
+      { number: 39, symbol: 'Y', nameKo: '이트륨', nameEn: 'Yttrium', row: 5, col: 3, category: 'transition' },
+      { number: 40, symbol: 'Zr', nameKo: '지르코늄', nameEn: 'Zirconium', row: 5, col: 4, category: 'transition' },
+      { number: 41, symbol: 'Nb', nameKo: '나이오븀', nameEn: 'Niobium', row: 5, col: 5, category: 'transition' },
+      { number: 42, symbol: 'Mo', nameKo: '몰리브데넘', nameEn: 'Molybdenum', row: 5, col: 6, category: 'transition' },
+      { number: 43, symbol: 'Tc', nameKo: '테크네튬', nameEn: 'Technetium', row: 5, col: 7, category: 'transition' },
+      { number: 44, symbol: 'Ru', nameKo: '루테늄', nameEn: 'Ruthenium', row: 5, col: 8, category: 'transition' },
+      { number: 45, symbol: 'Rh', nameKo: '로듐', nameEn: 'Rhodium', row: 5, col: 9, category: 'transition' },
+      { number: 46, symbol: 'Pd', nameKo: '팔라듐', nameEn: 'Palladium', row: 5, col: 10, category: 'transition' },
+      { number: 47, symbol: 'Ag', nameKo: '은', nameEn: 'Silver', row: 5, col: 11, category: 'transition' },
+      { number: 48, symbol: 'Cd', nameKo: '카드뮴', nameEn: 'Cadmium', row: 5, col: 12, category: 'transition' },
+      { number: 49, symbol: 'In', nameKo: '인듐', nameEn: 'Indium', row: 5, col: 13, category: 'transition' },
+      { number: 50, symbol: 'Sn', nameKo: '주석', nameEn: 'Tin', row: 5, col: 14, category: 'transition' },
+      { number: 51, symbol: 'Sb', nameKo: '안티모니', nameEn: 'Antimony', row: 5, col: 15, category: 'metalloid' },
+      { number: 52, symbol: 'Te', nameKo: '텔루륨', nameEn: 'Tellurium', row: 5, col: 16, category: 'metalloid' },
+      { number: 53, symbol: 'I', nameKo: '아이오딘', nameEn: 'Iodine', row: 5, col: 17, category: 'halogen' },
+      { number: 54, symbol: 'Xe', nameKo: '제논', nameEn: 'Xenon', row: 5, col: 18, category: 'noble-gas' },
+      
+      // 6주기
+      { number: 55, symbol: 'Cs', nameKo: '세슘', nameEn: 'Cesium', row: 6, col: 1, category: 'alkali' },
+      { number: 56, symbol: 'Ba', nameKo: '바륨', nameEn: 'Barium', row: 6, col: 2, category: 'alkaline-earth' },
+      { number: 57, symbol: 'La', nameKo: '란타넘', nameEn: 'Lanthanum', row: 9, col: 1, category: 'lanthanide' },
+      { number: 58, symbol: 'Ce', nameKo: '세륨', nameEn: 'Cerium', row: 9, col: 2, category: 'lanthanide' },
+      { number: 59, symbol: 'Pr', nameKo: '프라세오디뮴', nameEn: 'Praseodymium', row: 9, col: 3, category: 'lanthanide' },
+      { number: 60, symbol: 'Nd', nameKo: '네오디뮴', nameEn: 'Neodymium', row: 9, col: 4, category: 'lanthanide' },
+      { number: 61, symbol: 'Pm', nameKo: '프로메튬', nameEn: 'Promethium', row: 9, col: 5, category: 'lanthanide' },
+      { number: 62, symbol: 'Sm', nameKo: '사마륨', nameEn: 'Samarium', row: 9, col: 6, category: 'lanthanide' },
+      { number: 63, symbol: 'Eu', nameKo: '유로퓸', nameEn: 'Europium', row: 9, col: 7, category: 'lanthanide' },
+      { number: 64, symbol: 'Gd', nameKo: '가돌리늄', nameEn: 'Gadolinium', row: 9, col: 8, category: 'lanthanide' },
+      { number: 65, symbol: 'Tb', nameKo: '터븀', nameEn: 'Terbium', row: 9, col: 9, category: 'lanthanide' },
+      { number: 66, symbol: 'Dy', nameKo: '디스프로슘', nameEn: 'Dysprosium', row: 9, col: 10, category: 'lanthanide' },
+      { number: 67, symbol: 'Ho', nameKo: '홀뮴', nameEn: 'Holmium', row: 9, col: 11, category: 'lanthanide' },
+      { number: 68, symbol: 'Er', nameKo: '어븀', nameEn: 'Erbium', row: 9, col: 12, category: 'lanthanide' },
+      { number: 69, symbol: 'Tm', nameKo: '툴륨', nameEn: 'Thulium', row: 9, col: 13, category: 'lanthanide' },
+      { number: 70, symbol: 'Yb', nameKo: '이터븀', nameEn: 'Ytterbium', row: 9, col: 14, category: 'lanthanide' },
+      { number: 71, symbol: 'Lu', nameKo: '루테튬', nameEn: 'Lutetium', row: 9, col: 15, category: 'lanthanide' },
+      { number: 72, symbol: 'Hf', nameKo: '하프늄', nameEn: 'Hafnium', row: 6, col: 4, category: 'transition' },
+      { number: 73, symbol: 'Ta', nameKo: '탄탈럼', nameEn: 'Tantalum', row: 6, col: 5, category: 'transition' },
+      { number: 74, symbol: 'W', nameKo: '텅스텐', nameEn: 'Tungsten', row: 6, col: 6, category: 'transition' },
+      { number: 75, symbol: 'Re', nameKo: '레늄', nameEn: 'Rhenium', row: 6, col: 7, category: 'transition' },
+      { number: 76, symbol: 'Os', nameKo: '오스뮴', nameEn: 'Osmium', row: 6, col: 8, category: 'transition' },
+      { number: 77, symbol: 'Ir', nameKo: '이리듐', nameEn: 'Iridium', row: 6, col: 9, category: 'transition' },
+      { number: 78, symbol: 'Pt', nameKo: '백금', nameEn: 'Platinum', row: 6, col: 10, category: 'transition' },
+      { number: 79, symbol: 'Au', nameKo: '금', nameEn: 'Gold', row: 6, col: 11, category: 'transition' },
+      { number: 80, symbol: 'Hg', nameKo: '수은', nameEn: 'Mercury', row: 6, col: 12, category: 'transition' },
+      { number: 81, symbol: 'Tl', nameKo: '탈륨', nameEn: 'Thallium', row: 6, col: 13, category: 'transition' },
+      { number: 82, symbol: 'Pb', nameKo: '납', nameEn: 'Lead', row: 6, col: 14, category: 'transition' },
+      { number: 83, symbol: 'Bi', nameKo: '비스무트', nameEn: 'Bismuth', row: 6, col: 15, category: 'transition' },
+      { number: 84, symbol: 'Po', nameKo: '폴로늄', nameEn: 'Polonium', row: 6, col: 16, category: 'metalloid' },
+      { number: 85, symbol: 'At', nameKo: '아스타틴', nameEn: 'Astatine', row: 6, col: 17, category: 'halogen' },
+      { number: 86, symbol: 'Rn', nameKo: '라돈', nameEn: 'Radon', row: 6, col: 18, category: 'noble-gas' },
+      
+      // 7주기
+      { number: 87, symbol: 'Fr', nameKo: '프랑슘', nameEn: 'Francium', row: 7, col: 1, category: 'alkali' },
+      { number: 88, symbol: 'Ra', nameKo: '라듐', nameEn: 'Radium', row: 7, col: 2, category: 'alkaline-earth' },
+      { number: 89, symbol: 'Ac', nameKo: '악티늄', nameEn: 'Actinium', row: 10, col: 1, category: 'actinide' },
+      { number: 90, symbol: 'Th', nameKo: '토륨', nameEn: 'Thorium', row: 10, col: 2, category: 'actinide' },
+      { number: 91, symbol: 'Pa', nameKo: '프로트악티늄', nameEn: 'Protactinium', row: 10, col: 3, category: 'actinide' },
+      { number: 92, symbol: 'U', nameKo: '우라늄', nameEn: 'Uranium', row: 10, col: 4, category: 'actinide' },
+      { number: 93, symbol: 'Np', nameKo: '넵투늄', nameEn: 'Neptunium', row: 10, col: 5, category: 'actinide' },
+      { number: 94, symbol: 'Pu', nameKo: '플루토늄', nameEn: 'Plutonium', row: 10, col: 6, category: 'actinide' },
+      { number: 95, symbol: 'Am', nameKo: '아메리슘', nameEn: 'Americium', row: 10, col: 7, category: 'actinide' },
+      { number: 96, symbol: 'Cm', nameKo: '퀴륨', nameEn: 'Curium', row: 10, col: 8, category: 'actinide' },
+      { number: 97, symbol: 'Bk', nameKo: '버클륨', nameEn: 'Berkelium', row: 10, col: 9, category: 'actinide' },
+      { number: 98, symbol: 'Cf', nameKo: '캘리포늄', nameEn: 'Californium', row: 10, col: 10, category: 'actinide' },
+      { number: 99, symbol: 'Es', nameKo: '아인슈타이늄', nameEn: 'Einsteinium', row: 10, col: 11, category: 'actinide' },
+      { number: 100, symbol: 'Fm', nameKo: '페르뮴', nameEn: 'Fermium', row: 10, col: 12, category: 'actinide' },
+      { number: 101, symbol: 'Md', nameKo: '멘델레븀', nameEn: 'Mendelevium', row: 10, col: 13, category: 'actinide' },
+      { number: 102, symbol: 'No', nameKo: '노벨륨', nameEn: 'Nobelium', row: 10, col: 14, category: 'actinide' },
+      { number: 103, symbol: 'Lr', nameKo: '로렌슘', nameEn: 'Lawrencium', row: 10, col: 15, category: 'actinide' },
+      { number: 104, symbol: 'Rf', nameKo: '러더포듐', nameEn: 'Rutherfordium', row: 7, col: 4, category: 'transition' },
+      { number: 105, symbol: 'Db', nameKo: '더브늄', nameEn: 'Dubnium', row: 7, col: 5, category: 'transition' },
+      { number: 106, symbol: 'Sg', nameKo: '시보귬', nameEn: 'Seaborgium', row: 7, col: 6, category: 'transition' },
+      { number: 107, symbol: 'Bh', nameKo: '보륨', nameEn: 'Bohrium', row: 7, col: 7, category: 'transition' },
+      { number: 108, symbol: 'Hs', nameKo: '하슘', nameEn: 'Hassium', row: 7, col: 8, category: 'transition' },
+      { number: 109, symbol: 'Mt', nameKo: '마이트너륨', nameEn: 'Meitnerium', row: 7, col: 9, category: 'transition' },
+      { number: 110, symbol: 'Ds', nameKo: '다름슈타튬', nameEn: 'Darmstadtium', row: 7, col: 10, category: 'transition' },
+      { number: 111, symbol: 'Rg', nameKo: '뢴트게늄', nameEn: 'Roentgenium', row: 7, col: 11, category: 'transition' },
+      { number: 112, symbol: 'Cn', nameKo: '코페르니슘', nameEn: 'Copernicium', row: 7, col: 12, category: 'transition' },
+      { number: 113, symbol: 'Nh', nameKo: '니호늄', nameEn: 'Nihonium', row: 7, col: 13, category: 'transition' },
+      { number: 114, symbol: 'Fl', nameKo: '플레로븀', nameEn: 'Flerovium', row: 7, col: 14, category: 'transition' },
+      { number: 115, symbol: 'Mc', nameKo: '모스코븀', nameEn: 'Moscovium', row: 7, col: 15, category: 'transition' },
+      { number: 116, symbol: 'Lv', nameKo: '리버모륨', nameEn: 'Livermorium', row: 7, col: 16, category: 'transition' },
+      { number: 117, symbol: 'Ts', nameKo: '테네신', nameEn: 'Tennessine', row: 7, col: 17, category: 'halogen' },
+      { number: 118, symbol: 'Og', nameKo: '오가네손', nameEn: 'Oganesson', row: 7, col: 18, category: 'noble-gas' }
+    ];
+
+    function createPeriodicTable() {
+      const mainTable = document.getElementById('periodic-table');
+      const lanthActContainer = document.getElementById('lanthanides-actinides');
+      
+      // 메인 주기율표 (1-7주기)
+      for (let row = 1; row <= 7; row++) {
+        for (let col = 1; col <= 18; col++) {
+          const element = elements.find(e => e.row === row && e.col === col);
+          
+          if (element) {
+            const card = createElementCard(element);
+            mainTable.appendChild(card);
+          } else if ((row === 6 && col === 3) || (row === 7 && col === 3)) {
+            // 6주기 3번: 57-71 표시자, 7주기 3번: 89-103 표시자
+            const seriesType = row === 6 ? 'lanthanide' : 'actinide';
+            const seriesNumber = row === 6 ? 9001 : 9002; // 표시 카드 전용 번호
+            const isFavoriteSeries = userFavorites.includes(seriesNumber);
+            
+            const indicator = document.createElement('div');
+            indicator.className = 'element-card series-card';
+            indicator.dataset.series = seriesType;
+            indicator.dataset.number = seriesNumber;
+            
+            const cardInner = document.createElement('div');
+            cardInner.className = 'card-inner';
+            
+            const frontDiv = document.createElement('div');
+            frontDiv.className = 'series-indicator';
+            frontDiv.innerHTML = `
+              <button class="favorite-btn ${isFavoriteSeries ? 'active' : ''}" onclick="toggleFavorite(event, ${seriesNumber}, true)">
+                ${isFavoriteSeries ? '✦' : '✧'}
+              </button>
+              <div style="font-size: 9px; margin-bottom: 2px;">${row === 6 ? '57-71' : '89-103'}</div>
+              <div style="font-size: 13px; font-weight: bold;">${row === 6 ? 'La-Lu' : 'Ac-Lr'}</div>
+            `;
+            
+            const backDiv = document.createElement('div');
+            backDiv.className = 'series-card-back';
+            backDiv.innerHTML = `
+              <button class="favorite-btn ${isFavoriteSeries ? 'active' : ''}" onclick="toggleFavorite(event, ${seriesNumber}, true)">
+                ${isFavoriteSeries ? '✦' : '✧'}
+              </button>
+              <div class="element-name-ko small">${row === 6 ? '란타넘족' : '악티늄족'}</div>
+              <div class="element-name-en">${row === 6 ? 'Lanthanide' : 'Actinides'}</div>
+            `;
+            
+            cardInner.appendChild(frontDiv);
+            cardInner.appendChild(backDiv);
+            indicator.appendChild(cardInner);
+            
+            // 클릭 이벤트 추가
+            indicator.addEventListener('click', (e) => {
+              if (!e.target.classList.contains('favorite-btn')) {
+                cardInner.classList.toggle('flipped');
+              }
+            });
+            
+            mainTable.appendChild(indicator);
+          } else {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'empty-cell';
+            mainTable.appendChild(emptyCell);
+          }
+        }
+      }
+      
+      // 란타넘족 (57-71번) - 왼쪽에 3칸 공백 추가
+      const spacer1 = document.createElement('div');
+      spacer1.className = 'spacer';
+      lanthActContainer.appendChild(spacer1);
+      
+      for (let col = 1; col <= 15; col++) {
+        const element = elements.find(e => e.row === 9 && e.col === col);
+        if (element) {
+          const card = createElementCard(element);
+          lanthActContainer.appendChild(card);
+        }
+      }
+      
+      // 악티늄족 (89-103번) - 왼쪽에 3칸 공백 추가
+      const spacer2 = document.createElement('div');
+      spacer2.className = 'spacer';
+      lanthActContainer.appendChild(spacer2);
+      
+      for (let col = 1; col <= 15; col++) {
+        const element = elements.find(e => e.row === 10 && e.col === col);
+        if (element) {
+          const card = createElementCard(element);
+          lanthActContainer.appendChild(card);
+        }
+      }
+    }
+
+    function createElementCard(element) {
+      const card = document.createElement('div');
+      card.className = 'element-card';
+      card.dataset.number = element.number;
+      
+      const isFavorite = userFavorites.includes(element.number);
+      
+      // 한글 이름이 4글자 이상이면 small 클래스 추가
+      const koNameClass = element.nameKo.length >= 4 ? 'element-name-ko small' : 'element-name-ko';
+      
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-front ${element.category}">
+            <button class="favorite-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavorite(event, ${element.number})">
+              ${isFavorite ? '✦' : '✧'}
+            </button>
+            <div class="element-number">${element.number}</div>
+            <div class="element-symbol">${element.symbol}</div>
+          </div>
+          <div class="card-back">
+            <button class="favorite-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavorite(event, ${element.number})">
+              ${isFavorite ? '✦' : '✧'}
+            </button>
+            <div class="${koNameClass}">${element.nameKo}</div>
+            <div class="element-name-en">${element.nameEn}</div>
+          </div>
+        </div>
+      `;
+      
+      card.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('favorite-btn')) {
+          card.classList.toggle('flipped');
+        }
+      });
+      
+      return card;
+    }
+
+    async function toggleFavorite(event, elementNumber, isSeriesButton = false) {
+      event.stopPropagation();
+      
+      try {
+        // 계열 버튼(La-Lu, Ac-Lr)인 경우
+        if (isSeriesButton && (elementNumber === 9001 || elementNumber === 9002)) {
+          const seriesNumbers = elementNumber === 9001 
+            ? Array.from({length: 15}, (_, i) => 57 + i)  // 57-71
+            : Array.from({length: 15}, (_, i) => 89 + i); // 89-103
+          
+          // 현재 표시 카드의 즐겨찾기 상태 확인
+          const seriesButton = document.querySelector(`[data-number="${elementNumber}"] .favorite-btn`);
+          const isCurrentlyFavorite = seriesButton.classList.contains('active');
+          
+          // 전체를 추가 또는 제거
+          const action = isCurrentlyFavorite ? 'remove' : 'add';
+          
+          // 표시 카드 자체도 포함
+          const allNumbers = [elementNumber, ...seriesNumbers];
+          
+          for (const num of allNumbers) {
+            const response = await fetch('/api/favorite-batch', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ 
+                elementNumber: num,
+                action: action
+              })
+            });
+          }
+          
+          // 모든 요청 후 최종 즐겨찾기 목록 가져오기
+          const finalResponse = await fetch('/api/favorites', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          const finalData = await finalResponse.json();
+          
+          if (finalData.success) {
+            // 모든 관련 버튼 업데이트
+            allNumbers.forEach(num => {
+              const buttons = document.querySelectorAll(`[data-number="${num}"] .favorite-btn`);
+              buttons.forEach(btn => {
+                if (finalData.favorites.includes(num)) {
+                  btn.classList.add('active');
+                  btn.textContent = '✦';
+                } else {
+                  btn.classList.remove('active');
+                  btn.textContent = '✧';
+                }
+              });
+            });
+          }
+        } else {
+          // 개별 원소 토글
+          const response = await fetch('/api/favorite', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ elementNumber })
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            // 토글한 원소 버튼 업데이트
+            const buttons = document.querySelectorAll(`[data-number="${elementNumber}"] .favorite-btn`);
+            buttons.forEach(btn => {
+              if (data.favorites.includes(elementNumber)) {
+                btn.classList.add('active');
+                btn.textContent = '✦';
+              } else {
+                btn.classList.remove('active');
+                btn.textContent = '✧';
+              }
+            });
+            
+            // 란타넘족(57-71) 또는 악티늄족(89-103)에 속한 원소인 경우
+            let seriesCardNumber = null;
+            let seriesNumbers = [];
+            
+            if (elementNumber >= 57 && elementNumber <= 71) {
+              seriesCardNumber = 9001;
+              seriesNumbers = Array.from({length: 15}, (_, i) => 57 + i);
+            } else if (elementNumber >= 89 && elementNumber <= 103) {
+              seriesCardNumber = 9002;
+              seriesNumbers = Array.from({length: 15}, (_, i) => 89 + i);
+            }
+            
+            // 해당 계열의 표시 카드가 있다면 상태 확인 및 업데이트
+            if (seriesCardNumber) {
+              // 계열 전체가 즐겨찾기인지 확인
+              const allFavorited = seriesNumbers.every(num => data.favorites.includes(num));
+              
+              // 표시 카드 업데이트
+              const seriesButtons = document.querySelectorAll(`[data-number="${seriesCardNumber}"] .favorite-btn`);
+              seriesButtons.forEach(btn => {
+                if (allFavorited) {
+                  btn.classList.add('active');
+                  btn.textContent = '✦';
+                } else {
+                  btn.classList.remove('active');
+                  btn.textContent = '✧';
+                }
+              });
+              
+              // 표시 카드 자체의 즐겨찾기도 DB에서 업데이트
+              if (allFavorited && !data.favorites.includes(seriesCardNumber)) {
+                await fetch('/api/favorite-batch', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ 
+                    elementNumber: seriesCardNumber,
+                    action: 'add'
+                  })
+                });
+              } else if (!allFavorited && data.favorites.includes(seriesCardNumber)) {
+                await fetch('/api/favorite-batch', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ 
+                    elementNumber: seriesCardNumber,
+                    action: 'remove'
+                  })
+                });
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error toggling favorite:', error);
+      }
+    }
+
+    createPeriodicTable();
+  </script>
+</body>
+</html>
