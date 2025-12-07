@@ -6,6 +6,7 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+console.log('PORT:', PORT); // 이거 찍어봐
 
 // MySQL 연결 풀 생성
 const pool = mysql.createPool({
