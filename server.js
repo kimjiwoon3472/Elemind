@@ -5,16 +5,14 @@ const mysql = require('mysql2/promise');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 8080;
-console.log('PORT:', PORT); // 이거 찍어봐
+const PORT = 3000;
 
 // MySQL 연결 풀 생성
 const pool = mysql.createPool({
-  host: process.env.MYSQLHOST,
-  user: process.env.MYSQLUSER,
-  password: process.env.MYSQLPASSWORD,
-  database: process.env.MYSQLDATABASE,
-  port: process.env.MYSQLPORT,
+  host: 'localhost',
+  user: 'ptuser',
+  password: 'ptpassword',
+  database: 'periodic_table',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -124,102 +122,6 @@ app.get('/logout', (req, res) => {
   res.redirect('/login');
 });
 
-// 라우트: 반복 학습 페이지
-app.get('/repeat-study', async (req, res) => {
-  if (!req.session.userId) {
-    return res.redirect('/login');
-  }
-  
-  try {
-    const [favorites] = await pool.query(
-      'SELECT element_number FROM favorites WHERE user_id = ?',
-      [req.session.userId]
-    );
-    
-    const favoriteNumbers = favorites.map(f => f.element_number);
-    
-    res.render('repeat-study', {
-      username: req.session.username,
-      favorites: favoriteNumbers
-    });
-  } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).send('서버 오류가 발생했습니다.');
-  }
-});
-
-// 라우트: 객관식 학습 페이지
-app.get('/multiple-choice', async (req, res) => {
-  if (!req.session.userId) {
-    return res.redirect('/login');
-  }
-  
-  try {
-    const [favorites] = await pool.query(
-      'SELECT element_number FROM favorites WHERE user_id = ?',
-      [req.session.userId]
-    );
-    
-    const favoriteNumbers = favorites.map(f => f.element_number);
-    
-    res.render('multiple-choice', {
-      username: req.session.username,
-      favorites: favoriteNumbers
-    });
-  } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).send('서버 오류가 발생했습니다.');
-  }
-});
-
-// 라우트: 주관식 학습 페이지
-app.get('/short-answer', async (req, res) => {
-  if (!req.session.userId) {
-    return res.redirect('/login');
-  }
-  
-  try {
-    const [favorites] = await pool.query(
-      'SELECT element_number FROM favorites WHERE user_id = ?',
-      [req.session.userId]
-    );
-    
-    const favoriteNumbers = favorites.map(f => f.element_number);
-    
-    res.render('short-answer', {
-      username: req.session.username,
-      favorites: favoriteNumbers
-    });
-  } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).send('서버 오류가 발생했습니다.');
-  }
-});
-
-// 라우트: 테스트 페이지
-app.get('/test', async (req, res) => {
-  if (!req.session.userId) {
-    return res.redirect('/login');
-  }
-  
-  try {
-    const [favorites] = await pool.query(
-      'SELECT element_number FROM favorites WHERE user_id = ?',
-      [req.session.userId]
-    );
-    
-    const favoriteNumbers = favorites.map(f => f.element_number);
-    
-    res.render('test', {
-      username: req.session.username,
-      favorites: favoriteNumbers
-    });
-  } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).send('서버 오류가 발생했습니다.');
-  }
-});
-
 // API: 즐겨찾기 일괄 추가/제거
 app.post('/api/favorite-batch', async (req, res) => {
   if (!req.session.userId) {
@@ -322,7 +224,7 @@ app.post('/api/favorite', async (req, res) => {
 });
 
 // 서버 시작
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`서버가 포트 ${PORT} 에서 실행중입니다.`);
+app.listen(PORT, () => {
+  console.log(`서버가 http://localhost:${PORT} 에서 실행중입니다.`);
   console.log('MySQL 데이터베이스에 연결되었습니다.');
 });
